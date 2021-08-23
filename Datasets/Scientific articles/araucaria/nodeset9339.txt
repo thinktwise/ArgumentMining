@@ -1,0 +1,1 @@
+<span class="highlighted" id="node1">Here are some bear tracks.</span><div><span class="highlighted"><br></span></div><div><span class="highlighted"><span class="highlighted" id="node2">A bear passed away,.</span></span></div>
