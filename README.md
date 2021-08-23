@@ -1,7 +1,7 @@
 # ArgumentMining
 
 ## REFERENCES
-Before using the datasets please check its specific licence.
+Before using a dataset please check its specific licence.
 
 ### Scientific articles
 AraucariaDB [1] augmented by [2] with claims annotations
