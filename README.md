@@ -18,7 +18,7 @@ To train and test a model (currently only trained on Wikipedia data), run: (curr
 
     python classification.py
 
-The resulted model will be able to classify sentences from text
+The resulted model will be able to classify sentences from a text as argument components (or not).
 
 ## Current results
 ![Reults.png](Results.png)
@@ -33,7 +33,7 @@ You can see example of the claims retrieved in the following picture, or use the
 Please feel free to contribute or raise an issue.
 
 ## License
-We have to choose a licence for this
+We have to choose a licence.
 
 ## DATASETS
 Before using a dataset, please check its specific licence.
@@ -48,6 +48,7 @@ The annotated student essays dataset was created by [3] and [4]
 ### Wikipedia
 The "Wikipedia datasets come from annotated Wikipedia article from the IBM Debater project [5].
 
+## References
 
 [1] Belland, B. R., Glazewski, K. D., & Richardson, J. C. (2008). A scaffolding framework to support the construction of evidence-based arguments among middle school students. Educational Technology Research and Development, 56(4), 401-422.
 
