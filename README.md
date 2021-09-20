@@ -9,7 +9,7 @@ Most of the proposed models for arguments components distinguish three types of 
 The following picture [1] show how these component can relates and form complex arguments, in their terminology authors uses claims for conclusive claims and premises for supportive claims.
 Currently argument mining detects both conclusive claims and supportive claims as "claims".
 
-![An argumention model by Belland & al](model.png "Model from Belland & al")
+![An argumention model by Belland & al](model.png)
 
 Source: Belland, B. R., Glazewski, K. D., & Richardson, J. C. (2008). A scaffolding framework to support the construction of evidence-based arguments among middle school students. Educational Technology Research and Development, 56(4), 401-422.
 
@@ -21,13 +21,13 @@ To train and test a model (currently only trained on Wikipedia data), run: (curr
 The resulted model will be able to classify sentences from text
 
 ## Current results
-![Results.png](Results.png)
+![Reults.png](Results.png)
 
 These results are undermined by the fact that not all claims are but only those related with some topics. (Currently working on improving this).
 Also results for claims will be added this week.
 You can see example of the claims retrieved in the following picture, or use the model to predict with your own texts.
 
-![img.png](claim example.png)
+![claim_example.png](claim_example.png)
 
 ## Contribute
 Please feel free to contribute or raise an issue.
