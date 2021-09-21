@@ -24,7 +24,7 @@ We are currently working on improving this procedure by adding arguments.
 The resulted model will be able to classify sentences from a text as argument components (or not).
 
 ## Current results
-![Reults.png](Results.png)
+![results.png](results.png)
 
 These results are undermined because in the currently used dataset, not all claims are annotated but only those related with some specific topics. (Currently working on improving this).
 Also results for evidences detections will be added this week.
