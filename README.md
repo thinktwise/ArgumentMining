@@ -1,6 +1,6 @@
 # ArgumentMining
 
-Argument Mining allow you to explore argumentation in texts, by detecting argument components as well as the relations between them.
+ArgumentMining allows you to explore argumentation in texts, by detecting argument components as well as the relations between them.
 Argument components detection is a stain needed for multiple NLP tasks, like fact checking, knowledge base population or source trustiness evaluation [2].
 In the current version, the output machine learning model is trained and tested using Wikipedia articles. 
 
