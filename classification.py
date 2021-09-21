@@ -1,25 +1,23 @@
-#import numpy as np
 import os
-
 import nltk
 import numpy as np
 import tensorflow_hub as hub
-from keras import layers, Model, optimizers
-from keras.layers import Dense
+from keras import layers
 from sklearn.model_selection import train_test_split
-
+from sklearn.metrics import classification_report
 import Preprocessing.wikipedia_dataset
 import tensorflow as tf
-import keras.layers
 import keras.callbacks
 import keras.metrics
-from sklearn.preprocessing import OneHotEncoder
-
 import pickle
+import random
 
+# Get X (sentences) and Y from the original dataset
 X, Y = Preprocessing.wikipedia_dataset.getDataLabelledSentences()
-X_updated = []
+print("X length is".format(len(X)))
+print("Y length is".format(len(Y)))
 
+# Remove words from the sentences (eg stopwords, proper nouns...)
 #for sentence in X:
 #    tagged_sentence = nltk.tag.pos_tag(sentence.split())
 #    print(tagged_sentence)
@@ -28,55 +26,28 @@ X_updated = []
 #    print(' '.join(edited_sentence))
 #    X_updated.append(' '.join(edited_sentence))
 
-#print("X")
-#print(X)
 
-#print("Y")
-#print(Y)
-#Y = Y[0]
-print(len(X))
-print(len(Y))
-
-#X = X[0:1000]
-#Y = Y[0:1000]
-train_len = int(len(X)/100 * 80)
-
-print("train_len")
-print(train_len)
-
-embed = hub.load("universal-sentence-encoder_4")
-
-#X_embed = embed(X)
-#print(len(X_embed))
-
-#type_one_hot = OneHotEncoder(sparse=False).fit_transform(
-#    np.array(Y).reshape(-1, 1)
-#)
 
 Y = np.array(Y)
-
-#X_sent_train = X[0:train_len]
-#X_sent_test = X[train_len:len(X)-1]
-#Y_train = Y[0:train_len]
-#Y_test = Y[train_len:len(Y)-1]
-
-Reload_embeddings = False
-
 X_train = []
 X_test = []
 
-# does not work yet, do not use this code
+# If false, save the embeddings as pickle to save time next time
+Reload_embeddings = False
 if not Reload_embeddings:
-    with open('sentences_embedded_train_s.pkl', 'rb') as f:
+    with open('sentences_embedded_train.pkl', 'rb') as f:
         X_train = pickle.load(f)
-    with open('sentences_embedded_test_s.pkl', 'rb') as f:
+    with open('sentences_embedded_test.pkl', 'rb') as f:
         X_test = pickle.load(f)
-    with open('Y_train_s.pkl', 'rb') as f:
+    with open('Y_train.pkl', 'rb') as f:
         Y_train = pickle.load(f)
-    with open('Y_test_s.pkl', 'rb') as f:
+    with open('Y_test.pkl', 'rb') as f:
         Y_test = pickle.load(f)
 
 else:
+    # Divide data in train and test
+    train_len = int(len(X) / 100 * 80)
+
     X_sent_train, X_sent_test, Y_train, Y_test = \
         train_test_split(
             X,
@@ -84,20 +55,15 @@ else:
             test_size=.1
         )
 
-    with open('Y_train_s.pkl', 'wb') as f:
-        pickle.dump(Y_train, f)
-    with open('Y_test_s.pkl', 'wb') as f:
-        pickle.dump(Y_test, f)
-
+    # embed sentences in train and test using USE
+    # You must download https://tfhub.dev/google/universal-sentence-encoder/4 and extract it
+    embed = hub.load("universal-sentence-encoder_4")
     for r in X_sent_train:
-      #print(r)
       emb = embed([r])
       review_emb = tf.reshape(emb, [-1]).numpy()
       X_train.append(review_emb)
 
     X_train = np.array(X_train)
-    with open('sentences_embedded_train_s.pkl', 'wb') as f:
-        pickle.dump(X_train, f)
 
     for r in X_sent_test:
       emb = embed([r])
@@ -105,57 +71,42 @@ else:
       X_test.append(review_emb)
 
     X_test = np.array(X_test)
-    with open('sentences_embedded_test_s.pkl', 'wb') as f:
+
+    # Save X and Y as pickle
+    with open('Y_train.pkl', 'wb') as f:
+        pickle.dump(Y_train, f)
+    with open('Y_test.pkl', 'wb') as f:
+        pickle.dump(Y_test, f)
+    with open('sentences_embedded_train.pkl', 'wb') as f:
+        pickle.dump(X_train, f)
+    with open('sentences_embedded_test.pkl', 'wb') as f:
         pickle.dump(X_test, f)
 
 
 print(X_train.shape, Y_train.shape)
 
-import random
-
+# Set the ratio of positive and negative example
 X_train_diminued = []
 Y_train_diminued = []
-
-print("before")
-print(Y_test)
-
-# This slow and poorly written function set the ratio of positive and negative example
 # TODO vectorize this
 percentage_chance = 0
 i = 0
 for idx, sent in enumerate(X_train):
-    #print(random.random())
     if random.random() < percentage_chance and Y_train[idx] == 0:
-        #print("we skip")
+        # Example at this idx is not kept
         continue
     else:
         X_train_diminued.append(sent)
         Y_train_diminued.append(Y_train[idx])
         i = i + 1
-        #print("we keep")
-
-
+        # Example at this idx is kept
 
 X_train = np.array(X_train_diminued)
 Y_train = np.array(Y_train_diminued)
 
-print("after")
-print(Y_test)
-
-
-
 print(X_train.shape, Y_train.shape)
 
-#testing purpose: less data to speed up
-#X_train = X[0:80]
-#X_test = X[80:100]
-
-#Y_train = Y[0:80]
-#Y_test = Y[80:100]
-
-
-# You must download https://tfhub.dev/google/universal-sentence-encoder/4 and extract it  
-
+# Create neural network
 model = keras.Sequential()
 model.add(
   keras.layers.Dense(
@@ -178,13 +129,7 @@ model.add(
 )
 model.add(keras.layers.Dense(1, activation='sigmoid'))
 
-#model = keras.Sequential()
-#model.add(layers.Embedding(28650, 512, input_length=1,  name="w2v_embedding"))
-#model.add(keras.layers.Dense(64, activation='relu'))
-#model.add(keras.layers.Dense(2, activation='softmax'))
-
 model.summary()
-
 model.compile(optimizer='adam',
               loss='binary_crossentropy',
               metrics=['accuracy',keras.metrics.Precision(), keras.metrics.Recall()])
@@ -197,12 +142,13 @@ model.compile(optimizer='adam',
 #                                                 save_weights_only=True,
 #                                                 verbose=1)
 
-es = keras.callbacks.EarlyStopping(monitor='recall',
+# validation set may be too small for this being really effective
+es = keras.callbacks.EarlyStopping(monitor='val_loss',
                               min_delta=0,
-                              patience=3,
+                              patience=2,
                               verbose=0, mode='auto')
 
-print("test")
+# start training
 history = model.fit(
     X_train, Y_train,
     epochs=20,
@@ -215,59 +161,23 @@ history = model.fit(
 
 )
 
-#model.fit(X,
-#          Y,
-#          epochs=2)
-          #callbacks=[cp_callback])
-          #validation_data=(x_test, y_test))
-
-
-
 score=model.evaluate(X_test, Y_test, verbose=2)
-
 print(score)
 
 predictions = model.predict(X_test)
 
-#for idx, prediction in enumerate(predictions):
-#    print(X_sent_test[idx])
-#    if np.argmax(prediction) == 0:
-#        print("not claim")
-#    else:
-#        print("A claim")
-#    print(prediction)
 
-from sklearn.metrics import classification_report
-
+# Predict on the test data
 y_pred = model.predict(X_test)
-
-print("y_pred")
-print(y_pred)
-#y_pred [y_pred[0] > 0.4] = 1
-#y_pred [y_pred[0] <= 0.4] = 0
 
 thresh = 0.5
 y_pred = [1 if a_ > thresh else 0 for a_ in y_pred]
 
-#y_pred = np.argmax(y_pred, axis=1)
-
-print("y_pred")
-print(y_pred)
-
-print("Y_test")
-print(Y_test)
-
-#Y_test = np.argmax(Y_test, axis=1)
-
-print("Y_test")
-print(Y_test)
-
-
+# Print resuts
 print(classification_report(Y_test, y_pred, target_names=["Not claim", "Claim"]))
-#print(classification_report(Y_test, y_pred, target_names=['not claim', 'claim']))
 
+# Print the claims in included in text files of the following directory
 directory = os.fsencode("Datasets/Wikipedia/test")
-
 
 for file in os.listdir(directory):
     filename = os.fsdecode(file)
