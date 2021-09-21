@@ -36,7 +36,7 @@ You can see examples of the claims retrieved in the following picture. You can a
 Please feel free to contribute or raise an issue.
 
 ## License
-We have to choose a licence.
+See LICENSE.md
 
 ## DATASETS
 Before using a dataset, please check its specific licence.
